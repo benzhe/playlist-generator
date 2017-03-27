@@ -1,0 +1,30 @@
+{
+  "name": "m3u-generator",
+  "version": "1.0.0",
+  "description": "Generate m3u playlist from local library, now support netease music collection and custom adaptor.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/benzhe/m3u-generator.git"
+  },
+  "author": "ben+npm@yunbeta.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/benzhe/m3u-generator/issues"
+  },
+  "homepage": "https://github.com/benzhe/m3u-generator#readme",
+  "dependencies": {
+    "cheerio": "^0.22.0",
+    "commander": "^2.9.0",
+    "lodash": "^4.17.4",
+    "m3u": "^0.0.2",
+    "musicmetadata": "^2.0.5",
+    "p-queue": "^1.0.0",
+    "recursive-readdir": "^2.1.1",
+    "request": "^2.81.0",
+    "sqlite3": "^3.1.8"
+  }
+}
