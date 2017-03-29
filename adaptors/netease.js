@@ -24,7 +24,7 @@ function getCollectionList() {
                 rows.forEach(function(row) {
                     pids = pids.concat(row.pids.split(',').filter((item) => item)).map(parseFloat);
                 });
-                console.log(pids);
+                // console.log(pids);
                 const query = `SELECT * FROM web_playlist WHERE pid IN (${pids.join(',')})`;
                 db.all(query, function(err, rows) {
                     // console.log(rows.length);
@@ -76,6 +76,7 @@ function parseCollectionDetail(collection, list) {
         name,
         list: songs
     };
+    console.log(`成功下载歌单信息：${name} 共 ${songs.length} 首歌`);
     return co;
 }
 

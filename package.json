@@ -23,6 +23,7 @@
     "m3u": "^0.0.2",
     "musicmetadata": "^2.0.5",
     "p-queue": "^1.0.0",
+    "progress": "^1.1.8",
     "recursive-readdir": "^2.1.1",
     "request": "^2.81.0",
     "sqlite3": "^3.1.8"
