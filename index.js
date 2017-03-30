@@ -10,7 +10,6 @@ const m3u = require('m3u');
 const recursive = require('recursive-readdir');
 const progress = require('progress');
 const packageInfo = require('./package');
-const adaptor = require('./adaptors/netease');
 
 const UNSUPPORTED_TYPES = ['!*.mp3'];
 
@@ -19,7 +18,7 @@ program
     .option('-l, --library [value]', 'Local library path')
     .option('-a, --adaptor [value]', 'Adaptor module path')
     .option('-o, --output [value]', 'Output path')
-    .option('-g, --generate [value]', 'Generate library detail list in cvs format')
+    .option('-g, --generate', 'Generate library detail list in cvs format')
     .parse(process.argv);
 
 
@@ -86,10 +85,11 @@ reader.then(function (files) {
     return queue.onEmpty();
 }).then(function () {
     console.log('Available files count:', list.length);
-    fs.writeFileSync('list.csv', listfile, { encoding: 'UTF-8' });
+    if(program.generate) fs.writeFileSync('list.csv', listfile, { encoding: 'UTF-8' });
+    const adaptor = require(program.adaptor);
     return adaptor();
 }).then(function (collections) {
-    console.log(`共 ${collections.length} 个有效歌单`);
+    console.log(`Total ${collections.length} available collection`);
     const songs = list;
     const res = [];
     collections.forEach((collection) => {
@@ -121,7 +121,6 @@ reader.then(function (files) {
         });
         res.push(co);
     });
-    // console.log(res);
     return res;
 }).then(function (collections) {
     return collections.filter((collection) => {
@@ -139,11 +138,11 @@ reader.then(function (files) {
 }).then(function (collections) {
     collections.forEach((collection) => {
         const name = collection.name;
-        const filepath = path.resolve(output, name + '-encode.m3u8');
+        const filepath = path.resolve(output, name + '.m3u8');
         const writer = require('m3u').extendedWriter();
         collection.list.forEach((song) => {
             if (song.path) {
-                const relative = encodeURI(path.relative(output, song.path));
+                const relative = path.relative(output, song.path);
                 const artists = escapeSemicolon(song.artists.join('/'));
                 const songname = escapeSemicolon(song.name);
                 writer.file(relative, -1, `${artists} - ${songname}`);

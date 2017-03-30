@@ -20,14 +20,11 @@ function getCollectionList() {
         let pids = [];
         db.serialize(function () {
             db.all(`SELECT * FROM web_user_playlist`, function (err, rows) {
-                // console.log(rows);
                 rows.forEach(function(row) {
                     pids = pids.concat(row.pids.split(',').filter((item) => item)).map(parseFloat);
                 });
-                // console.log(pids);
                 const query = `SELECT * FROM web_playlist WHERE pid IN (${pids.join(',')})`;
                 db.all(query, function(err, rows) {
-                    // console.log(rows.length);
                     resolve(rows);
                 });
                 db.close();
@@ -48,7 +45,6 @@ function getCollectionDetail(collection) {
             const $els = $('ul.f-hide + textarea');
             if ($els.length === 1) {
                 const list = JSON.parse($els.text());
-                // console.log(list.length);
                 returnList.push(parseCollectionDetail(collection, list));
             }
             resolve();
