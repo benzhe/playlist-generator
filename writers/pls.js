@@ -16,7 +16,7 @@ module.exports = function (collections, output) {
             if (song.path) {
                 const relative = path.relative(output, song.path);
                 // File1=../../Music/中文/纣王老胡/昨天/纣王老胡 - 涩.mp3
-                content += `File=${index + 1}=${relative}\r`;
+                content += `File${index + 1}=${relative}\r`;
             }
         });
         fs.writeFileSync(filepath, content, { encoding: 'UTF-8' });
