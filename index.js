@@ -6,7 +6,6 @@ const path = require('path');
 const program = require('commander');
 const mm = require('musicmetadata');
 const pqueue = require('p-queue');
-const m3u = require('m3u');
 const recursive = require('recursive-readdir');
 const progress = require('progress');
 const packageInfo = require('./package');
@@ -18,6 +17,7 @@ program
     .option('-l, --library [value]', 'Local library path')
     .option('-a, --adaptor [value]', 'Adaptor module path')
     .option('-o, --output [value]', 'Output path')
+    .option('--pls [value]', 'Generate pls instead of m3u')
     .option('-g, --generate', 'Generate library detail list in cvs format')
     .parse(process.argv);
 
@@ -34,10 +34,6 @@ const reader = new Promise(function (resolve, reject) {
 
 const list = [];
 let listfile = '';
-
-function escapeSemicolon(str) {
-    return str.replace(/;/g, '%3B');
-}
 
 function parseMeta(metadata) {
     let artist = metadata.artist;
@@ -127,29 +123,24 @@ reader.then(function (files) {
         const failList = [];
         let successCount = 0;
         console.log(`Matching ${collection.name}...`);
-        collection.list.forEach((song) => {
+        collection.list = collection.list.filter((song) => {
             if (!song.path) {
-                console.log(`    Missing: ${song.artists.join('/')} - ${song.name}`)
+                console.log(`    Missing: ${song.artists.join('/')} - ${song.name}`);
+                return false;
             }
-            else successCount++;
+            else {
+                successCount++;
+                return true;
+            }
         });
         return successCount;
     });
 }).then(function (collections) {
-    collections.forEach((collection) => {
-        const name = collection.name;
-        const filepath = path.resolve(output, name + '.m3u8');
-        const writer = require('m3u').extendedWriter();
-        collection.list.forEach((song) => {
-            if (song.path) {
-                const relative = path.relative(output, song.path);
-                const artists = escapeSemicolon(song.artists.join('/'));
-                const songname = escapeSemicolon(song.name);
-                writer.file(relative, -1, `${artists} - ${songname}`);
-            }
-        });
-        fs.writeFileSync(filepath, writer.toString(), { encoding: 'UTF-8' });
-        console.log(`Writing ${filepath}`);
-    });
+    if (program.pls) {
+        require('./writers/pls')(collections, output);
+    }
+    else {
+        require('./writers/m3u')(collections, output);
+    }
 });
 
