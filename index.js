@@ -18,6 +18,7 @@ program
     .option('-a, --adaptor [value]', 'Adaptor module path')
     .option('-o, --output [value]', 'Output path')
     .option('--pls [value]', 'Generate pls instead of m3u')
+    .option('--wpl [value]', 'Generate wpl instead of m3u')
     .option('-g, --generate', 'Generate library detail list in cvs format')
     .parse(process.argv);
 
@@ -138,6 +139,9 @@ reader.then(function (files) {
 }).then(function (collections) {
     if (program.pls) {
         require('./writers/pls')(collections, output);
+    }
+    else if (program.wpl) {
+        require('./writers/wpl')(collections, output);
     }
     else {
         require('./writers/m3u')(collections, output);
