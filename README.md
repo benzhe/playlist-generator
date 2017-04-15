@@ -5,7 +5,7 @@ Generate playlist from local library, now support netease music collection and c
 ### Install & Help
 
 ```
-npm install m3u-generator -g
+npm install playlist-generator -g
 
 playlist-generator --help
 
