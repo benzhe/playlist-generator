@@ -1,6 +1,6 @@
-## m3u-generator
+## playlist-generator
 
-Generate playlist from local library, now support netease music collection and custom adaptor.
+Generate playlist from local library, now support netease music collection and custom adaptor, output `m3u8` format as default.
 
 ### Install & Help
 

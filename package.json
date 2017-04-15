@@ -1,5 +1,5 @@
 {
-  "name": "m3u-generator",
+  "name": "playlist-generator",
   "version": "1.2.1",
   "description": "Generate playlist from local library, now support netease music collection and custom adaptor.",
   "main": "index.js",
