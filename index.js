@@ -82,7 +82,8 @@ reader.then(function (files) {
     return queue.onEmpty();
 }).then(function () {
     console.log('Available files count:', list.length);
-    if(program.generate) fs.writeFileSync('list.csv', listfile, { encoding: 'UTF-8' });
+    if(program.generate) 
+        fs.writeFileSync(path.resolve(output, 'list.csv'), listfile, { encoding: 'UTF-8' });
     const adaptor = require(program.adaptor);
     return adaptor();
 }).then(function (collections) {

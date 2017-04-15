@@ -1,5 +1,8 @@
 const fs = require('fs');
 const path = require('path');
+const Entities = require('html-entities').XmlEntities;
+
+entities = new Entities();
 
 module.exports = function (collections, output) {
     collections.forEach((collection) => {
@@ -10,7 +13,9 @@ module.exports = function (collections, output) {
             if (song.path) {
                 const relative = path.relative(output, song.path);
                 const fl = relative.replace(/\//ig, '\\');
-                content += `<media src="${fl}"/>\n`;
+                const ul = fl.normalize('NFC');
+                const el = entities.encodeNonUTF(ul);
+                content += `<media src="${el}"/>\n`;
             }
         });
         const tpl = `

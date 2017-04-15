@@ -1,8 +1,11 @@
 {
   "name": "m3u-generator",
-  "version": "1.0.0",
-  "description": "Generate m3u playlist from local library, now support netease music collection and custom adaptor.",
+  "version": "1.2.1",
+  "description": "Generate playlist from local library, now support netease music collection and custom adaptor.",
   "main": "index.js",
+  "bin": {
+    "playlist-generator": "./index.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -19,6 +22,7 @@
   "dependencies": {
     "cheerio": "^0.22.0",
     "commander": "^2.9.0",
+    "html-entities": "^1.2.0",
     "lodash": "^4.17.4",
     "m3u": "^0.0.2",
     "musicmetadata": "^2.0.5",

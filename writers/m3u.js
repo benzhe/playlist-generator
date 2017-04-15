@@ -16,7 +16,7 @@ module.exports = function (collections, output) {
                 const relative = path.relative(output, song.path);
                 const artists = escapeSemicolon(song.artists.join('/'));
                 const songname = escapeSemicolon(song.name);
-                writer.file(relative, -1, `${artists} - ${songname}`);
+                writer.file(relative.normalize('NFC'), -1, `${artists} - ${songname}`);
             }
         });
         fs.writeFileSync(filepath, writer.toString(), { encoding: 'UTF-8' });

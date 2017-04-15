@@ -10,7 +10,7 @@ module.exports = function (collections, output) {
         collection.list.forEach((song, index) => {
             if (song.path) {
                 const relative = path.relative(output, song.path);
-                content += `File${index + 1}=${relative}\n\n`;
+                content += `File${index + 1}=${relative.normalize('NFC')}\n\n`;
             }
         });
         fs.writeFileSync(filepath, content, { encoding: 'UTF-8' });

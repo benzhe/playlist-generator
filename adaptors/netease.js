@@ -1,3 +1,6 @@
+/**
+ * 仅支持 Mac OS，请先安装网易云音乐客户端并登录，确认左侧有你收藏/喜欢的歌单
+ */
 
 const request = require('request');
 const sqlite3 = require('sqlite3');
