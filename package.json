@@ -1,6 +1,6 @@
 {
   "name": "playlist-generator",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Generate playlist from local library, now support netease music collection and custom adaptor.",
   "main": "index.js",
   "bin": {
