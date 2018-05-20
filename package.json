@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/benzhe/m3u-generator#readme",
   "dependencies": {
+    "bufferutil": "^3.0.5",
     "cheerio": "^0.22.0",
     "commander": "^2.9.0",
     "html-entities": "^1.2.0",
@@ -28,8 +29,11 @@
     "musicmetadata": "^2.0.5",
     "p-queue": "^1.0.0",
     "progress": "^1.1.8",
+    "puppeteer": "^1.4.0",
     "recursive-readdir": "^2.1.1",
     "request": "^2.81.0",
-    "sqlite3": "^3.1.8"
+    "sqlite3": "^3.1.8",
+    "supports-color": "^5.4.0",
+    "utf-8-validate": "^4.0.2"
   }
 }
