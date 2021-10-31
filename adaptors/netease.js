@@ -1,5 +1,8 @@
 /**
- * 仅支持 Mac OS，请先安装网易云音乐客户端并登录，确认左侧有你收藏/喜欢的歌单
+ * 1. 请先安装网易云音乐客户端并登录，确认左侧有你收藏/喜欢的歌单
+ * 2. 执行过程请输入在浏览器中登录 music.163.com 后改网页的 cookie value
+ * 3. 不登录仅支持每歌单 10 首歌，登录后仅 20 首歌
+ * 4. 完整歌单建议使用 netease-local
  */
 
 const request = require('request');
@@ -8,9 +11,19 @@ const path = require('path');
 const cheerio = require('cheerio')
 const pqueue = require('p-queue');
 const puppeteer = require('puppeteer');
+const platform = require('os').platform();
+const isWsl = require('is-wsl');
+const inquirer = require('inquirer');
+const converCookieStr = require('../utils/cookie');
 
-const dbPath = path.resolve(getUserHome(),
+let dbPath = path.resolve(getUserHome(),
     './Library/Containers/com.netease.163music/Data/Documents/storage/sqlite_storage.sqlite3');
+
+if (isWsl) {
+    const userHome = execSync('wslpath "$(wslvar USERPROFILE)"', { encoding: 'UTF-8' }).trim();
+    dbPath = `${userHome}/AppData/Local/Netease/CloudMusic/Library/webdb.dat`
+}
+
 
 const returnList = [];
 
@@ -26,11 +39,11 @@ function getCollectionList() {
         let pids = [];
         db.serialize(function () {
             db.all(`SELECT * FROM web_user_playlist`, function (err, rows) {
-                rows.forEach(function(row) {
+                rows.forEach(function (row) {
                     pids = pids.concat(row.pids.split(',').filter((item) => item)).map(parseFloat);
                 });
                 const query = `SELECT * FROM web_playlist WHERE pid IN (${pids.join(',')})`;
-                db.all(query, function(err, rows) {
+                db.all(query, function (err, rows) {
                     rows = rows.filter((row) => {
                         return JSON.parse(row.playlist).trackCount;
                     })
@@ -43,18 +56,25 @@ function getCollectionList() {
     });
 }
 
+let hasSetCookie = false;
 async function getNewPage(browser) {
     const page = await browser.newPage();
     await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36');
-    await page.setExtraHTTPHeaders({
-        'Pragma': 'no-cache',
-        'Connection': 'keep-alive',
-        'Cache-Control': 'no-cache',
-        'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,zh-TW;q=0.7',
-        'Accept-Encoding' : 'gzip, deflate',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-        'Referer': 'http://music.163.com/'
-    });
+    if (!hasSetCookie) {
+        hasSetCookie = true;
+        let cookieStr = '';
+        let ans = await inquirer.prompt([
+            {
+                name: 'cookie',
+                message: '网易云音乐 Cookie：',
+            }
+        ]);
+        cookieStr = ans['cookie'] ? ans['cookie'] : cookieStr;
+        console.log('GET COOKIE:', cookieStr);
+        const cookies = converCookieStr(cookieStr);
+        await page.setCookie(...cookies);
+
+    }
     return page;
 }
 
@@ -62,7 +82,7 @@ function getCollectionDetail(collection) {
     return new Promise(function (resolve, reject) {
         (async () => {
             const page = await getNewPage(browser);
-                
+
             const id = collection.pid;
             const url = `http://music.163.com/#/playlist?id=${id}`;
             // console.log(url);
@@ -71,15 +91,19 @@ function getCollectionDetail(collection) {
                 waitUntil: ['load', 'domcontentloaded', 'networkidle0', 'networkidle2']
             });
             const frame = await page.frames().find(f => f.name() === 'contentFrame');
-            await frame.waitForSelector('.m-table');
-            // const table = await frame.$('.m-table');
+            await frame.waitForSelector('.m-table', {
+                timeout: 60000
+            });
             const tableHTML = await frame.$eval('.m-table', node => node.outerHTML);
+
+            //console.log(tableHTML);
 
             const $table = cheerio.load(tableHTML);
 
             const $list = $table('.icn.icn-share[data-res-id]');
 
             const list = Array.from($list.map((index, $item) => {
+                // console.log($item.attribs['data-res-name']);
                 return {
                     name: $item.attribs['data-res-name'],
                     // album: song.album.name,
@@ -142,13 +166,13 @@ function initBrowser() {
 function run() {
     return initBrowser().then(() => {
         return new Promise((resolve, reject) => {
-            getCollectionList().then(function(collections) {
-                const queue = new pqueue({concurrency: 1});
-                collections.forEach(function(collection) {
+            getCollectionList().then(function (collections) {
+                const queue = new pqueue({ concurrency: 1 });
+                collections.forEach(function (collection) {
                     queue.add(() => getCollectionDetail(collection));
                 });
                 return queue.onEmpty();
-            }).then(function(){
+            }).then(function () {
                 const res = returnList.filter((item) => item);
                 resolve(res);
             });
