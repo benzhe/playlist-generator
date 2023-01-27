@@ -2,7 +2,7 @@
 
 Generate playlist from local library, now support [netease](https://github.com/benzhe/playlist-generator/wiki/netease-proccess) music collection and custom adaptor, output `m3u8` format as default.
 
-> Make sure that all music files in your local library contain collect id3 information.
+> Make sure that all music files in your local library contain correct id3 information.
 
 ### Install & Help
 
